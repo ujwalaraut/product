@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +24,7 @@ public class ProductController {
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Product Created"),
             @ApiResponse(responseCode = "400", description = "Invalid input")})
     @PostMapping("/add")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductDTOResponse> addProduct(@Valid @RequestBody ProductDTORequest product) {
         ProductDTOResponse response = productService.addProduct(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -33,6 +35,7 @@ public class ProductController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Successfully retrieved"),
     @ApiResponse(responseCode = "404", description = "Product not found")})
     @GetMapping("/get/{id}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ProductDTOResponse getProduct(@PathVariable("id") Long id) {
 
         return productService.getProduct(id);
@@ -42,6 +45,7 @@ public class ProductController {
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Product updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input")})
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ProductDTOResponse updateProduct(@PathVariable("id") Long id, @RequestBody ProductDTORequest product) {
 
         return productService.updateProduct(id, product);
@@ -51,6 +55,7 @@ public class ProductController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Product deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Product not found")})
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteProductById(@PathVariable("id") Long id) {
 
         productService.deleteProduct(id);
